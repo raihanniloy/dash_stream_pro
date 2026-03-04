@@ -54,7 +54,7 @@ export async function verifyPassword(
         reject(err);
         return;
       }
-      resolve(key === derivedKey.toString("hex"));
+      resolve(crypto.timingSafeEqual(derivedKey, Buffer.from(key, "hex")));
     });
   });
 }
