@@ -51,5 +51,4 @@ CREATE TABLE IF NOT EXISTS share_links (
   created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-PRAGMA foreign_keys = ON;
 `;
