@@ -1,0 +1,6 @@
+date,region,product,revenue,units
+2024-01-01,North,Widget A,1500.50,100
+2024-01-01,South,Widget B,2300.00,150
+2024-02-01,North,Widget A,1800.75,120
+2024-02-01,South,Widget B,2100.00,140
+2024-03-01,North,Widget C,900.25,60
