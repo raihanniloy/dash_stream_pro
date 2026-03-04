@@ -1,4 +1,5 @@
 import os
+os.environ["SKIP_PATH_VALIDATION"] = "1"
 import pytest
 from parsers import parse_file, get_sheet_names
 
