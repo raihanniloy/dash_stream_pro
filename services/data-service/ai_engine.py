@@ -1,10 +1,10 @@
 import json
 import os
 from typing import Any
-import anthropic
+from openai import OpenAI
 
-anthropic_client = anthropic.Anthropic(
-    api_key=os.environ.get("ANTHROPIC_API_KEY", ""),
+openai_client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY", ""),
 )
 
 
@@ -54,12 +54,12 @@ def suggest_charts(
     prompt = build_prompt(profile, num_suggestions, existing_charts)
 
     try:
-        response = anthropic_client.messages.create(
-            model="claude-sonnet-4-5",
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
             max_tokens=1024,
             messages=[{"role": "user", "content": prompt}],
         )
-        text = response.content[0].text
+        text = response.choices[0].message.content or ""
         suggestions = json.loads(text)
         if isinstance(suggestions, list):
             return suggestions

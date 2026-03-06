@@ -25,15 +25,19 @@ def test_build_prompt_includes_column_info():
     assert "categorical" in prompt
 
 
-@patch("ai_engine.anthropic_client")
+@patch("ai_engine.openai_client")
 def test_suggest_charts_returns_structured_suggestions(mock_client):
     suggestions = [
         {"type": "line", "x": "date", "y": "revenue", "title": "Revenue Over Time", "reason": "Track trends"},
         {"type": "bar", "x": "region", "y": "revenue", "title": "Revenue by Region", "reason": "Compare regions"},
     ]
+    mock_message = MagicMock()
+    mock_message.content = json.dumps(suggestions)
+    mock_choice = MagicMock()
+    mock_choice.message = mock_message
     mock_response = MagicMock()
-    mock_response.content = [MagicMock(text=json.dumps(suggestions))]
-    mock_client.messages.create.return_value = mock_response
+    mock_response.choices = [mock_choice]
+    mock_client.chat.completions.create.return_value = mock_response
 
     result = suggest_charts(_make_profile(), num_suggestions=2)
     assert len(result) == 2
