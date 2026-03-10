@@ -1,7 +1,11 @@
-# services/streamlit-app/app.py
 import streamlit as st
 
-st.set_page_config(page_title="DashStream Pro", layout="wide")
+st.set_page_config(
+    page_title="DashStream Pro",
+    page_icon=":bar_chart:",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 st.title("DashStream Pro")
 st.markdown(
