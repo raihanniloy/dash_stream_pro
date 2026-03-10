@@ -1,143 +1,79 @@
 # DashStream Pro
 
-A full-stack data analytics dashboard platform. Upload CSV/Excel files, get AI-powered chart suggestions, build interactive dashboards, and share them publicly.
+A data analytics dashboard platform built with Streamlit. Upload CSV or Excel files, explore your data, get AI-powered chart suggestions, and build interactive dashboards — all from a single Python app.
 
 ## Tech Stack
 
-**Frontend**
-- Next.js 16 (App Router) + React 19
-- TypeScript, Tailwind CSS v4, shadcn/ui
-- Recharts for chart rendering
-
-**Backend**
-- Next.js API routes (auth, dashboards, data sources)
-- SQLite via `better-sqlite3`
-- Python FastAPI microservice for data processing and AI suggestions
-- OpenAI GPT-4o-mini for chart recommendations
+- **Python 3.11+**
+- **Streamlit** — multi-page web app framework
+- **Plotly** — interactive chart rendering
+- **pandas** — data loading and manipulation
+- **OpenAI GPT-4o-mini** — AI chart recommendations
+- **data-service modules** — parsers, profiler, and AI engine reused from the existing service layer
 
 ## Features
 
-- **Authentication** — register/login with session-based auth (`iron-session`)
-- **File Upload** — drag-and-drop CSV and Excel files
-- **Data Profiling** — automatic column statistics and data preview
-- **AI Chart Suggestions** — GPT-4o-mini analyzes your data profile and recommends chart types
-- **Dashboard Editor** — build multi-chart dashboards with a grid layout
-- **Public Sharing** — generate shareable public links for dashboards
+- **File Upload** — upload CSV, Excel (.xlsx/.xls), and plain-text (.txt) files
+- **Data Profiling** — automatic column statistics: types, nulls, unique counts, min/max/mean
+- **AI Chart Suggestions** — GPT-4o-mini analyzes your data profile and recommends chart types with configurations
+- **Interactive Dashboard Builder** — pick columns, choose chart types, and render Plotly figures in-browser
 
 ## Project Structure
 
 ```
-├── src/
-│   ├── app/
-│   │   ├── (auth)/         # Login & register pages
-│   │   ├── (app)/          # Protected app pages
-│   │   │   ├── dashboards/ # Dashboard list & editor
-│   │   │   └── upload/     # File upload page
-│   │   ├── api/            # Next.js API routes
-│   │   └── share/          # Public shared dashboard view
-│   ├── components/         # React components
-│   ├── hooks/              # Custom React hooks
-│   └── lib/                # DB, auth, API utilities
-└── services/
-    └── data-service/       # Python FastAPI service
-        ├── main.py
-        ├── routes.py       # /process/upload, /ai/suggest-charts, /data/query
-        ├── parsers.py      # CSV/Excel parsing
-        ├── profiler.py     # Data profiling
-        └── ai_engine.py    # OpenAI integration
+services/
+  streamlit-app/
+    app.py                  # Home page
+    pages/
+      1_Upload.py           # Upload + data preview
+      2_Dashboard.py        # Chart builder
+      3_AI_Suggestions.py   # AI-powered suggestions
+    chart_builder.py        # Plotly figure factory
+    requirements.txt
+    tests/
+      test_chart_builder.py
+  data-service/
+    parsers.py              # CSV/Excel parsing
+    profiler.py             # Column statistics
+    ai_engine.py            # OpenAI chart suggestions
+    tests/
 ```
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 20+
 - Python 3.11+
 
-### 1. Install frontend dependencies
+### 1. Set up the virtual environment
 
 ```bash
-npm install
-```
-
-### 2. Set up Python data service
-
-```bash
-cd services/data-service
+cd services/streamlit-app
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Configure environment
+### 2. Configure environment
 
-Copy `.env.example` to `.env.local` and fill in the values:
-
-```bash
-cp .env.example .env.local
-```
-
-```env
-PYTHON_SERVICE_URL=http://localhost:8000
-SESSION_SECRET=change-me-to-a-random-string-at-least-32-chars
-OPENAI_API_KEY=sk-...
-```
-
-### 4. Run both services
+Export your OpenAI API key:
 
 ```bash
-npm run dev:all
+export OPENAI_API_KEY=sk-...
 ```
 
-This starts:
-- Next.js frontend at [http://localhost:3000](http://localhost:3000)
-- Python data service at [http://localhost:8000](http://localhost:8000)
-
-Or run them separately:
+### 3. Run the app
 
 ```bash
-# Terminal 1 — Python service
-cd services/data-service && source .venv/bin/activate && uvicorn main:app --reload --port 8000
-
-# Terminal 2 — Next.js
-npm run dev
+streamlit run app.py
 ```
 
-## Available Scripts
+The app opens at [http://localhost:8501](http://localhost:8501).
+
+## Available Commands
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Start Next.js dev server |
-| `npm run dev:all` | Start both Next.js and Python service |
-| `npm run build` | Build for production |
-| `npm run start` | Run production build |
-| `npm run test` | Run tests with Vitest |
-| `npm run test:watch` | Run tests in watch mode |
-| `npm run lint` | Run ESLint |
-| `npm run type-check` | Run TypeScript type checker |
-
-## API Routes
-
-### Auth
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
-- `GET  /api/auth/me`
-
-### Data Sources
-- `GET    /api/data-sources`
-- `POST   /api/upload`
-- `DELETE /api/data-sources/[id]`
-
-### Dashboards
-- `GET    /api/dashboards`
-- `POST   /api/dashboards`
-- `GET    /api/dashboards/[id]`
-- `PUT    /api/dashboards/[id]`
-- `DELETE /api/dashboards/[id]`
-- `POST   /api/dashboards/[id]/suggest` — trigger AI chart suggestions
-- `GET    /api/dashboards/[id]/share`   — get/create share token
-- `GET    /api/share/[token]`           — public shared dashboard
-
-### Data Query (proxy to Python service)
-- `POST /api/data-query` — query parsed data for chart rendering
+| `streamlit run app.py` | Start the app |
+| `python -m pytest tests/` | Run chart_builder tests |
+| `cd ../data-service && python -m pytest tests/` | Run data-service tests |
