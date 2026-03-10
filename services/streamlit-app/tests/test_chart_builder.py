@@ -49,3 +49,14 @@ def test_pie_chart_returns_figure(df):
 def test_unknown_type_raises(df):
     with pytest.raises(ValueError, match="Unsupported chart type"):
         build_chart(df, {"type": "heatmap", "x": "region", "y": "revenue", "title": "X"})
+
+
+def test_empty_dataframe_raises(df):
+    empty = pd.DataFrame({"region": pd.Series([], dtype=str), "revenue": pd.Series([], dtype=float)})
+    with pytest.raises(ValueError, match="DataFrame is empty"):
+        build_chart(empty, {"type": "bar", "x": "region", "y": "revenue", "title": "Empty"})
+
+
+def test_missing_config_key_raises(df):
+    with pytest.raises(KeyError):
+        build_chart(df, {"type": "bar", "x": "region", "title": "No y"})
