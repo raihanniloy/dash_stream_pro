@@ -39,6 +39,7 @@ if uploaded is not None:
     df = pd.DataFrame(parsed["data"])
     if st.session_state.get("filename") != uploaded.name:
         st.session_state["charts"] = []
+        st.session_state.pop("suggestions", None)
     st.session_state["df"] = df
     st.session_state["profile"] = profile
     st.session_state["filename"] = uploaded.name
