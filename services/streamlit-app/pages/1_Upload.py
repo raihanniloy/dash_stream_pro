@@ -19,18 +19,26 @@ uploaded = st.file_uploader("Choose a CSV or Excel file", type=["csv", "xlsx", "
 if uploaded is not None:
     suffix = "." + uploaded.name.rsplit(".", 1)[-1].lower()
     file_type = suffix.lstrip(".")
-    if file_type in ("xlsx", "xls"):
-        file_type = "excel"
+    if file_type == "xls":
+        file_type = "xlsx"
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
         tmp.write(uploaded.getbuffer())
         tmp_path = tmp.name
 
-    with st.spinner("Parsing and profiling…"):
-        parsed = parse_file(tmp_path, file_type)
-        profile = profile_data(parsed)
+    try:
+        with st.spinner("Parsing and profiling…"):
+            parsed = parse_file(tmp_path, file_type)
+            profile = profile_data(parsed)
+    except Exception as e:
+        st.error(f"Could not parse file: {e}")
+        os.unlink(tmp_path)
+        st.stop()
+    os.unlink(tmp_path)
 
     df = pd.DataFrame(parsed["data"])
+    if st.session_state.get("filename") != uploaded.name:
+        st.session_state["charts"] = []
     st.session_state["df"] = df
     st.session_state["profile"] = profile
     st.session_state["filename"] = uploaded.name
