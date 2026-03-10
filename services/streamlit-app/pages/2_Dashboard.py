@@ -18,6 +18,10 @@ if "df" not in st.session_state:
 df = st.session_state["df"]
 columns = list(df.columns)
 
+if len(columns) < 2:
+    st.warning("This dataset has only one column. At least two columns are needed to build a chart.")
+    st.stop()
+
 st.subheader("Add a Chart")
 with st.form("add_chart"):
     col1, col2, col3, col4 = st.columns(4)
@@ -37,20 +41,21 @@ charts = st.session_state.get("charts", [])
 if not charts:
     st.info("No charts yet. Add one above or get AI suggestions.")
 else:
-    to_remove = None
-    pairs = [charts[i : i + 2] for i in range(0, len(charts), 2)]
+    to_remove_idx = None
+    indexed = list(enumerate(charts))
+    pairs = [indexed[i : i + 2] for i in range(0, len(indexed), 2)]
     for pair in pairs:
         cols = st.columns(2)
-        for col, chart in zip(cols, pair):
+        for col, (idx, chart) in zip(cols, pair):
             with col:
                 try:
                     fig = build_chart(df, chart)
                     st.plotly_chart(fig, use_container_width=True)
                 except Exception as e:
                     st.error(f"Could not render '{chart['title']}': {e}")
-                if st.button("Remove", key=f"rm_{chart['title']}_{chart['x']}"):
-                    to_remove = chart
+                if st.button("Remove", key=f"rm_{idx}"):
+                    to_remove_idx = idx
 
-    if to_remove is not None:
-        st.session_state["charts"].remove(to_remove)
+    if to_remove_idx is not None:
+        st.session_state["charts"].pop(to_remove_idx)
         st.rerun()
